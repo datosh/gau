@@ -35,7 +35,7 @@ func TestPkgGraph_Size(t *testing.T) {
 		},
 		"variadic path": {
 			"github.com/datosh/gau/tests/...",
-			5,
+			7,
 		},
 	}
 
@@ -77,4 +77,13 @@ func TestPkgGraph_Roots(t *testing.T) {
 	graph.Load("github.com/datosh/gau/tests/a")
 
 	assert.Len(graph.Roots(), 1)
+}
+
+func TestPkgGraph_RootsVariadic(t *testing.T) {
+	assert := assert.New(t)
+	graph := NewPkgGraph()
+
+	graph.Load("github.com/datosh/gau/tests/...")
+
+	assert.Len(graph.Roots(), 4)
 }

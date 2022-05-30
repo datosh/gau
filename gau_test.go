@@ -43,6 +43,19 @@ func TestGau(t *testing.T) {
 					ShouldNot().DirectlyDependOn("github.com/datosh/gau/tests/a")
 			},
 		},
+		"fail: indirectona should directly depend on a": {
+			applier: func(g *gau) {
+				g.ResideIn("github.com/datosh/gau/tests/indirectona").
+					Should().DirectlyDependOn("github.com/datosh/gau/tests/a")
+			},
+			wantFail: true,
+		},
+		"success: no one should directly depend on nodependency": {
+			applier: func(g *gau) {
+				g.ResideIn("github.com/datosh/gau/tests/...").
+					ShouldNot().DirectlyDependOn("github.com/datosh/gau/tests/nodependency")
+			},
+		},
 	}
 
 	for name, tc := range testCases {
@@ -57,6 +70,36 @@ func TestGau(t *testing.T) {
 			} else {
 				assert.False(t, mockT.Failed())
 			}
+		})
+	}
+}
+
+func Test_expand(t *testing.T) {
+	testCases := map[string]struct {
+		pkg      string
+		wantPkgs []string
+	}{
+		"no expanse required": {
+			"github.com/datosh/gau",
+			[]string{"github.com/datosh/gau"},
+		},
+		"expand test": {
+			"github.com/datosh/gau/tests/...",
+			[]string{
+				"github.com/datosh/gau/tests/a",
+				"github.com/datosh/gau/tests/b",
+				"github.com/datosh/gau/tests/dependona",
+				"github.com/datosh/gau/tests/dependonaandb",
+				"github.com/datosh/gau/tests/dependonb",
+				"github.com/datosh/gau/tests/indirectona",
+				"github.com/datosh/gau/tests/nodependency",
+			},
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, tc.wantPkgs, expand(tc.pkg))
 		})
 	}
 }

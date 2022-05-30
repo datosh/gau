@@ -30,3 +30,9 @@ func TestPkgNode_IsIndirectlyDependingOn(t *testing.T) {
 
 	assert.True(t, foo.IsIndirectlyDependingOn("baz"))
 }
+
+func TestPkgNode_IsNotIndirectlyDependingOn(t *testing.T) {
+	foo := NewPkgNode("foo")
+
+	assert.False(t, foo.IsIndirectlyDependingOn("bar"))
+}

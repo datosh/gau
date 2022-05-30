@@ -1,6 +1,10 @@
 package gau
 
-import "testing"
+import (
+	"testing"
+
+	"golang.org/x/tools/go/packages"
+)
 
 type gau struct {
 	graph      *PkgGraph
@@ -9,7 +13,7 @@ type gau struct {
 
 	should bool
 
-	resideIn string
+	resideIn []string
 }
 
 func Packages(t *testing.T, pkgs ...string) *gau {
@@ -29,7 +33,7 @@ func (g *gau) That() *gau {
 }
 
 func (g *gau) ResideIn(pkg string) *gau {
-	g.resideIn = pkg
+	g.resideIn = expand(pkg)
 	return g
 }
 
@@ -43,19 +47,43 @@ func (g *gau) ShouldNot() *gau {
 }
 
 func (g *gau) DirectlyDependOn(pkg string) {
-	if g.graph.GetNode(g.resideIn).IsDependingOn(pkg) {
-		if g.should {
-			return
-		}
+	for _, resideIn := range g.resideIn {
+		g.directlyDependOn(resideIn, pkg)
+	}
+}
+
+func (g *gau) directlyDependOn(depender, dependee string) {
+	if xor(g.isDirectlyDependOn(depender, dependee), g.should) {
 		g.t.Fail()
 	}
 }
 
+func (g *gau) isDirectlyDependOn(depender, dependee string) bool {
+	return g.graph.GetNode(depender).IsDependingOn(dependee)
+}
+
 func (g *gau) IndirectlyDependOn(pkg string) {
-	if g.graph.GetNode(g.resideIn).IsIndirectlyDependingOn(pkg) {
-		if g.should {
-			return
+	for _, resideIn := range g.resideIn {
+		if g.graph.GetNode(resideIn).IsIndirectlyDependingOn(pkg) {
+			if !g.should {
+				g.t.Fail()
+			}
 		}
-		g.t.Fail()
 	}
+}
+
+func xor(a, b bool) bool {
+	return a != b
+}
+
+func expand(pkg string) []string {
+	var result []string
+	cfg := packages.Config{
+		Mode: packages.NeedName,
+	}
+	pkgs, _ := packages.Load(&cfg, pkg)
+	for _, pkg := range pkgs {
+		result = append(result, pkg.PkgPath)
+	}
+	return result
 }
