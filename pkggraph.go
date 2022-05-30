@@ -2,24 +2,24 @@ package gau
 
 import "golang.org/x/tools/go/packages"
 
-type PkgGraph struct {
-	lut   map[string]*PkgNode
-	roots []*PkgNode
+type pkgGraph struct {
+	lut   map[string]*pkgNode
+	roots []*pkgNode
 }
 
-func NewPkgGraph() *PkgGraph {
-	g := &PkgGraph{}
-	g.lut = make(map[string]*PkgNode)
+func newPkgGraph() *pkgGraph {
+	g := &pkgGraph{}
+	g.lut = make(map[string]*pkgNode)
 	return g
 }
 
-func (p *PkgGraph) addNode(pkgPath string) {
+func (p *pkgGraph) addNode(pkgPath string) {
 	if _, exists := p.lut[pkgPath]; !exists {
-		p.lut[pkgPath] = NewPkgNode(pkgPath)
+		p.lut[pkgPath] = newPkgNode(pkgPath)
 	}
 }
 
-func (p *PkgGraph) GetNode(pkgPath string) *PkgNode {
+func (p *pkgGraph) getNode(pkgPath string) *pkgNode {
 	if node, exists := p.lut[pkgPath]; exists {
 		return node
 	} else {
@@ -27,11 +27,11 @@ func (p *PkgGraph) GetNode(pkgPath string) *PkgNode {
 	}
 }
 
-func (p *PkgGraph) Size() int {
+func (p *pkgGraph) size() int {
 	return len(p.lut)
 }
 
-func (p *PkgGraph) Load(pkg string) error {
+func (p *pkgGraph) load(pkg string) error {
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedImports,
 	}
@@ -45,7 +45,7 @@ func (p *PkgGraph) Load(pkg string) error {
 		p.addNode(pkg.PkgPath)
 		for _, dependsOn := range pkg.Imports {
 			p.addNode(dependsOn.PkgPath)
-			p.GetNode(pkg.PkgPath).DependOn(p.GetNode(dependsOn.PkgPath))
+			p.getNode(pkg.PkgPath).dependOn(p.getNode(dependsOn.PkgPath))
 		}
 	}
 
@@ -53,8 +53,8 @@ func (p *PkgGraph) Load(pkg string) error {
 	return nil
 }
 
-func (p *PkgGraph) updateRoots() {
-	p.roots = make([]*PkgNode, 0)
+func (p *pkgGraph) updateRoots() {
+	p.roots = make([]*pkgNode, 0)
 
 	for _, node := range p.lut {
 		if len(node.dependedOnBy) == 0 {

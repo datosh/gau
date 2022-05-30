@@ -6,8 +6,8 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-type gau struct {
-	graph      *PkgGraph
+type Gau struct {
+	graph      *pkgGraph
 	t          *testing.T
 	toBeLoaded []string
 
@@ -17,48 +17,48 @@ type gau struct {
 	resideIn []string
 }
 
-func Packages(t *testing.T, pkgs ...string) *gau {
-	g := &gau{
-		graph:      NewPkgGraph(),
+func Packages(t *testing.T, pkgs ...string) *Gau {
+	g := &Gau{
+		graph:      newPkgGraph(),
 		t:          t,
 		toBeLoaded: pkgs,
 	}
 	return g
 }
 
-func (g *gau) That() *gau {
+func (g *Gau) That() *Gau {
 	for _, pkg := range g.toBeLoaded {
-		g.graph.Load(pkg)
+		g.graph.load(pkg)
 	}
 	return g
 }
 
-func (g *gau) ResideIn(pkg string) *gau {
+func (g *Gau) ResideIn(pkg string) *Gau {
 	g.resideIn = expand(pkg)
 	return g
 }
 
-func (g *gau) Should() *gau {
+func (g *Gau) Should() *Gau {
 	g.should = true
 	return g
 }
 
-func (g *gau) ShouldNot() *gau {
+func (g *Gau) ShouldNot() *Gau {
 	return g
 }
 
-func (g *gau) Except(pkg string) *gau {
+func (g *Gau) Except(pkg string) *Gau {
 	g.except = append(g.except, expand(pkg)...)
 	return g
 }
 
-func (g *gau) DirectlyDependOn(pkg string) {
+func (g *Gau) DirectlyDependOn(pkg string) {
 	for _, resideIn := range g.resideIn {
 		g.directlyDependOn(resideIn, pkg)
 	}
 }
 
-func (g *gau) directlyDependOn(depender, dependee string) {
+func (g *Gau) directlyDependOn(depender, dependee string) {
 	if g.inExcept(depender) {
 		return
 	}
@@ -67,13 +67,13 @@ func (g *gau) directlyDependOn(depender, dependee string) {
 	}
 }
 
-func (g *gau) isDirectlyDependOn(depender, dependee string) bool {
-	return g.graph.GetNode(depender).IsDependingOn(dependee)
+func (g *Gau) isDirectlyDependOn(depender, dependee string) bool {
+	return g.graph.getNode(depender).isDependingOn(dependee)
 }
 
-func (g *gau) IndirectlyDependOn(pkg string) {
+func (g *Gau) IndirectlyDependOn(pkg string) {
 	for _, resideIn := range g.resideIn {
-		if g.graph.GetNode(resideIn).IsIndirectlyDependingOn(pkg) {
+		if g.graph.getNode(resideIn).isIndirectlyDependingOn(pkg) {
 			if !g.should {
 				g.t.Fail()
 			}
@@ -81,7 +81,7 @@ func (g *gau) IndirectlyDependOn(pkg string) {
 	}
 }
 
-func (g *gau) inExcept(pkg string) bool {
+func (g *Gau) inExcept(pkg string) bool {
 	for _, exception := range g.except {
 		if exception == pkg {
 			return true
