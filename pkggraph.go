@@ -19,11 +19,6 @@ func (p *PkgGraph) addNode(pkgPath string) {
 	}
 }
 
-func (p *PkgGraph) AddNode(pkgPath string) {
-	p.addNode(pkgPath)
-	p.updateRoots()
-}
-
 func (p *PkgGraph) GetNode(pkgPath string) *PkgNode {
 	if node, exists := p.lut[pkgPath]; exists {
 		return node
@@ -56,10 +51,6 @@ func (p *PkgGraph) Load(pkg string) error {
 
 	p.updateRoots()
 	return nil
-}
-
-func (p *PkgGraph) Roots() []*PkgNode {
-	return p.roots
 }
 
 func (p *PkgGraph) updateRoots() {

@@ -6,14 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPkgGraph_AddNode(t *testing.T) {
-	graph := NewPkgGraph()
-
-	graph.AddNode("foo")
-
-	assert.Equal(t, "foo", graph.GetNode("foo").pkgPath)
-}
-
 func TestPkgGraph_GetNode_NotAdded(t *testing.T) {
 	graph := NewPkgGraph()
 
@@ -76,7 +68,7 @@ func TestPkgGraph_Roots(t *testing.T) {
 
 	graph.Load("github.com/datosh/gau/tests/a")
 
-	assert.Len(graph.Roots(), 1)
+	assert.Len(graph.roots, 1)
 }
 
 func TestPkgGraph_RootsVariadic(t *testing.T) {
@@ -85,5 +77,5 @@ func TestPkgGraph_RootsVariadic(t *testing.T) {
 
 	graph.Load("github.com/datosh/gau/tests/...")
 
-	assert.Len(graph.Roots(), 4)
+	assert.Len(graph.roots, 4)
 }

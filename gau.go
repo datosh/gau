@@ -62,7 +62,7 @@ func (g *gau) directlyDependOn(depender, dependee string) {
 	if g.inExcept(depender) {
 		return
 	}
-	if xor(g.isDirectlyDependOn(depender, dependee), g.should) {
+	if g.isDirectlyDependOn(depender, dependee) != g.should {
 		g.t.Fail()
 	}
 }
@@ -88,10 +88,6 @@ func (g *gau) inExcept(pkg string) bool {
 		}
 	}
 	return false
-}
-
-func xor(a, b bool) bool {
-	return a != b
 }
 
 func expand(pkg string) []string {
