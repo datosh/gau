@@ -15,24 +15,24 @@ func newPkgGraph() *pkgGraph {
 	}
 }
 
-func (p *pkgGraph) addNode(pkgPath string) {
-	if _, exists := p.lut[pkgPath]; !exists {
-		p.lut[pkgPath] = newPkgNode(pkgPath)
+func (g *pkgGraph) addNode(pkgPath string) {
+	if _, exists := g.lut[pkgPath]; !exists {
+		g.lut[pkgPath] = newPkgNode(pkgPath)
 	}
 }
 
-func (p *pkgGraph) getNode(pkgPath string) *pkgNode {
-	if node, exists := p.lut[pkgPath]; exists {
+func (g *pkgGraph) getNode(pkgPath string) *pkgNode {
+	if node, exists := g.lut[pkgPath]; exists {
 		return node
 	}
 	return nil
 }
 
-func (p *pkgGraph) size() int {
-	return len(p.lut)
+func (g *pkgGraph) size() int {
+	return len(g.lut)
 }
 
-func (p *pkgGraph) load(pkg string) error {
+func (g *pkgGraph) load(pkg string) error {
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedImports,
 	}
@@ -43,21 +43,21 @@ func (p *pkgGraph) load(pkg string) error {
 	}
 
 	for _, pkg := range pkgs {
-		p.addNode(pkg.PkgPath)
+		g.addNode(pkg.PkgPath)
 		for _, dependsOn := range pkg.Imports {
-			p.addNode(dependsOn.PkgPath)
-			p.getNode(pkg.PkgPath).dependOn(p.getNode(dependsOn.PkgPath))
+			g.addNode(dependsOn.PkgPath)
+			g.getNode(pkg.PkgPath).dependOn(g.getNode(dependsOn.PkgPath))
 		}
 	}
 
-	p.updateRoots()
+	g.updateRoots()
 	return nil
 }
 
-func (p *pkgGraph) updateRoots() {
-	for _, node := range p.lut {
+func (g *pkgGraph) updateRoots() {
+	for _, node := range g.lut {
 		if len(node.dependedOnBy) == 0 {
-			p.roots = append(p.roots, node)
+			g.roots = append(g.roots, node)
 		}
 	}
 }

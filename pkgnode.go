@@ -15,22 +15,22 @@ func newPkgNode(pkgPath string) *pkgNode {
 	return n
 }
 
-func (p *pkgNode) dependOn(other *pkgNode) {
-	p.dependsOn[other.pkgPath] = other
-	other.dependedOnBy[p.pkgPath] = p
+func (n *pkgNode) dependOn(other *pkgNode) {
+	n.dependsOn[other.pkgPath] = other
+	other.dependedOnBy[n.pkgPath] = n
 }
 
-func (p *pkgNode) isDependingOn(pkgName string) bool {
-	_, exists := p.dependsOn[pkgName]
+func (n *pkgNode) isDependingOn(pkgName string) bool {
+	_, exists := n.dependsOn[pkgName]
 	return exists
 }
 
-func (p *pkgNode) isIndirectlyDependingOn(pkgName string) bool {
-	if p.isDependingOn(pkgName) {
+func (n *pkgNode) isIndirectlyDependingOn(pkgName string) bool {
+	if n.isDependingOn(pkgName) {
 		return true
 	}
 
-	for _, dependingOn := range p.dependsOn {
+	for _, dependingOn := range n.dependsOn {
 		if dependingOn.isIndirectlyDependingOn(pkgName) {
 			return true
 		}
@@ -38,7 +38,7 @@ func (p *pkgNode) isIndirectlyDependingOn(pkgName string) bool {
 	return false
 }
 
-func (p *pkgNode) isDependedOnBy(pkgName string) bool {
-	_, exists := p.dependedOnBy[pkgName]
+func (n *pkgNode) isDependedOnBy(pkgName string) bool {
+	_, exists := n.dependedOnBy[pkgName]
 	return exists
 }
