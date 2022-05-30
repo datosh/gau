@@ -18,12 +18,11 @@ type Gau struct {
 }
 
 func Packages(t *testing.T, pkgs ...string) *Gau {
-	g := &Gau{
+	return &Gau{
 		graph:      newPkgGraph(),
 		t:          t,
 		toBeLoaded: pkgs,
 	}
-	return g
 }
 
 func (g *Gau) That() *Gau {

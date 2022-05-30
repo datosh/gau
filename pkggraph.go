@@ -1,6 +1,8 @@
 package gau
 
-import "golang.org/x/tools/go/packages"
+import (
+	"golang.org/x/tools/go/packages"
+)
 
 type pkgGraph struct {
 	lut   map[string]*pkgNode
@@ -8,9 +10,9 @@ type pkgGraph struct {
 }
 
 func newPkgGraph() *pkgGraph {
-	g := &pkgGraph{}
-	g.lut = make(map[string]*pkgNode)
-	return g
+	return &pkgGraph{
+		lut: make(map[string]*pkgNode),
+	}
 }
 
 func (p *pkgGraph) addNode(pkgPath string) {
@@ -22,9 +24,8 @@ func (p *pkgGraph) addNode(pkgPath string) {
 func (p *pkgGraph) getNode(pkgPath string) *pkgNode {
 	if node, exists := p.lut[pkgPath]; exists {
 		return node
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func (p *pkgGraph) size() int {
@@ -54,8 +55,6 @@ func (p *pkgGraph) load(pkg string) error {
 }
 
 func (p *pkgGraph) updateRoots() {
-	p.roots = make([]*pkgNode, 0)
-
 	for _, node := range p.lut {
 		if len(node.dependedOnBy) == 0 {
 			p.roots = append(p.roots, node)
