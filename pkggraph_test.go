@@ -30,12 +30,12 @@ func TestPkgGraph_Size(t *testing.T) {
 			1,
 		},
 		"single dependency": {
-			"github.com/datosh/gau/tests/dependOnA",
+			"github.com/datosh/gau/tests/dependona",
 			2,
 		},
 		"variadic path": {
 			"github.com/datosh/gau/tests/...",
-			3,
+			5,
 		},
 	}
 
@@ -52,9 +52,9 @@ func TestPkgGraph_IsDependingOn(t *testing.T) {
 	assert := assert.New(t)
 	graph := NewPkgGraph()
 
-	graph.Load("github.com/datosh/gau/tests/dependOnA")
+	graph.Load("github.com/datosh/gau/tests/dependona")
 
-	assert.True(graph.GetNode("github.com/datosh/gau/tests/dependOnA").
+	assert.True(graph.GetNode("github.com/datosh/gau/tests/dependona").
 		IsDependingOn("github.com/datosh/gau/tests/a"),
 	)
 }
@@ -63,10 +63,10 @@ func TestPkgGraph_IsDependedOnBy(t *testing.T) {
 	assert := assert.New(t)
 	graph := NewPkgGraph()
 
-	graph.Load("github.com/datosh/gau/tests/dependOnA")
+	graph.Load("github.com/datosh/gau/tests/dependona")
 
 	assert.True(graph.GetNode("github.com/datosh/gau/tests/a").
-		IsDependedOnBy("github.com/datosh/gau/tests/dependOnA"),
+		IsDependedOnBy("github.com/datosh/gau/tests/dependona"),
 	)
 }
 
