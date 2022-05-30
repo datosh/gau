@@ -1,44 +1,44 @@
 package gau
 
-type PkgNode struct {
-	dependsOn    map[string]*PkgNode
-	dependedOnBy map[string]*PkgNode
+type pkgNode struct {
+	dependsOn    map[string]*pkgNode
+	dependedOnBy map[string]*pkgNode
 	pkgPath      string
 }
 
-func NewPkgNode(pkgPath string) *PkgNode {
-	n := &PkgNode{
-		dependsOn:    make(map[string]*PkgNode),
-		dependedOnBy: make(map[string]*PkgNode),
+func newPkgNode(pkgPath string) *pkgNode {
+	n := &pkgNode{
+		dependsOn:    make(map[string]*pkgNode),
+		dependedOnBy: make(map[string]*pkgNode),
 		pkgPath:      pkgPath,
 	}
 	return n
 }
 
-func (p *PkgNode) DependOn(other *PkgNode) {
-	p.dependsOn[other.pkgPath] = other
-	other.dependedOnBy[p.pkgPath] = p
+func (n *pkgNode) dependOn(other *pkgNode) {
+	n.dependsOn[other.pkgPath] = other
+	other.dependedOnBy[n.pkgPath] = n
 }
 
-func (p *PkgNode) IsDependingOn(pkgName string) bool {
-	_, exists := p.dependsOn[pkgName]
+func (n *pkgNode) isDependingOn(pkgName string) bool {
+	_, exists := n.dependsOn[pkgName]
 	return exists
 }
 
-func (p *PkgNode) IsIndirectlyDependingOn(pkgName string) bool {
-	if p.IsDependingOn(pkgName) {
+func (n *pkgNode) isIndirectlyDependingOn(pkgName string) bool {
+	if n.isDependingOn(pkgName) {
 		return true
 	}
 
-	for _, dependingOn := range p.dependsOn {
-		if dependingOn.IsIndirectlyDependingOn(pkgName) {
+	for _, dependingOn := range n.dependsOn {
+		if dependingOn.isIndirectlyDependingOn(pkgName) {
 			return true
 		}
 	}
 	return false
 }
 
-func (p *PkgNode) IsDependedOnBy(pkgName string) bool {
-	_, exists := p.dependedOnBy[pkgName]
+func (n *pkgNode) isDependedOnBy(pkgName string) bool {
+	_, exists := n.dependedOnBy[pkgName]
 	return exists
 }

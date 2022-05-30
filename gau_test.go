@@ -8,56 +8,56 @@ import (
 
 func TestGau(t *testing.T) {
 	testCases := map[string]struct {
-		applier  func(*gau)
+		applier  func(*Gau)
 		wantFail bool
 	}{
 		"fail: dependona should not directly depend on a": {
-			applier: func(g *gau) {
+			applier: func(g *Gau) {
 				g.ResideIn("github.com/datosh/gau/tests/dependona").
 					ShouldNot().DirectlyDependOn("github.com/datosh/gau/tests/a")
 			},
 			wantFail: true,
 		},
 		"success: dependona should directly depend on a": {
-			applier: func(g *gau) {
+			applier: func(g *Gau) {
 				g.ResideIn("github.com/datosh/gau/tests/dependona").
 					Should().DirectlyDependOn("github.com/datosh/gau/tests/a")
 			},
 		},
 		"fail: indirectona should not indirectly depend on a": {
-			applier: func(g *gau) {
+			applier: func(g *Gau) {
 				g.ResideIn("github.com/datosh/gau/tests/indirectona").
 					ShouldNot().IndirectlyDependOn("github.com/datosh/gau/tests/a")
 			},
 			wantFail: true,
 		},
 		"success: indirectona should indirectly depend on a": {
-			applier: func(g *gau) {
+			applier: func(g *Gau) {
 				g.ResideIn("github.com/datosh/gau/tests/indirectona").
 					Should().IndirectlyDependOn("github.com/datosh/gau/tests/a")
 			},
 		},
 		"success: indirectona should not directly depend on a": {
-			applier: func(g *gau) {
+			applier: func(g *Gau) {
 				g.ResideIn("github.com/datosh/gau/tests/indirectona").
 					ShouldNot().DirectlyDependOn("github.com/datosh/gau/tests/a")
 			},
 		},
 		"fail: indirectona should directly depend on a": {
-			applier: func(g *gau) {
+			applier: func(g *Gau) {
 				g.ResideIn("github.com/datosh/gau/tests/indirectona").
 					Should().DirectlyDependOn("github.com/datosh/gau/tests/a")
 			},
 			wantFail: true,
 		},
 		"success: no one should directly depend on nodependency": {
-			applier: func(g *gau) {
+			applier: func(g *Gau) {
 				g.ResideIn("github.com/datosh/gau/tests/...").
 					ShouldNot().DirectlyDependOn("github.com/datosh/gau/tests/nodependency")
 			},
 		},
 		"success: no one except indirectona should directly depend on dependona": {
-			applier: func(g *gau) {
+			applier: func(g *Gau) {
 				g.ResideIn("github.com/datosh/gau/tests/...").
 					Except("github.com/datosh/gau/tests/indirectona").
 					ShouldNot().DirectlyDependOn("github.com/datosh/gau/tests/dependona")

@@ -7,32 +7,32 @@ import (
 )
 
 func TestPkgNode_DependOn(t *testing.T) {
-	foo := NewPkgNode("foo")
-	bar := NewPkgNode("bar")
+	foo := newPkgNode("foo")
+	bar := newPkgNode("bar")
 
-	foo.DependOn(bar)
+	foo.dependOn(bar)
 
-	assert.True(t, foo.IsDependingOn("bar"))
-	assert.False(t, foo.IsDependedOnBy("bar"))
+	assert.True(t, foo.isDependingOn("bar"))
+	assert.False(t, foo.isDependedOnBy("bar"))
 
-	assert.True(t, bar.IsDependedOnBy("foo"))
-	assert.False(t, bar.IsDependingOn("foo"))
+	assert.True(t, bar.isDependedOnBy("foo"))
+	assert.False(t, bar.isDependingOn("foo"))
 }
 
 func TestPkgNode_IsIndirectlyDependingOn(t *testing.T) {
 	// foo -> bar -> baz
-	foo := NewPkgNode("foo")
-	bar := NewPkgNode("bar")
-	baz := NewPkgNode("baz")
+	foo := newPkgNode("foo")
+	bar := newPkgNode("bar")
+	baz := newPkgNode("baz")
 
-	foo.DependOn(bar)
-	bar.DependOn(baz)
+	foo.dependOn(bar)
+	bar.dependOn(baz)
 
-	assert.True(t, foo.IsIndirectlyDependingOn("baz"))
+	assert.True(t, foo.isIndirectlyDependingOn("baz"))
 }
 
 func TestPkgNode_IsNotIndirectlyDependingOn(t *testing.T) {
-	foo := NewPkgNode("foo")
+	foo := newPkgNode("foo")
 
-	assert.False(t, foo.IsIndirectlyDependingOn("bar"))
+	assert.False(t, foo.isIndirectlyDependingOn("bar"))
 }

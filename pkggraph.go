@@ -1,42 +1,38 @@
 package gau
 
-import "golang.org/x/tools/go/packages"
+import (
+	"golang.org/x/tools/go/packages"
+)
 
-type PkgGraph struct {
-	lut   map[string]*PkgNode
-	roots []*PkgNode
+type pkgGraph struct {
+	lut   map[string]*pkgNode
+	roots []*pkgNode
 }
 
-func NewPkgGraph() *PkgGraph {
-	g := &PkgGraph{}
-	g.lut = make(map[string]*PkgNode)
-	return g
-}
-
-func (p *PkgGraph) addNode(pkgPath string) {
-	if _, exists := p.lut[pkgPath]; !exists {
-		p.lut[pkgPath] = NewPkgNode(pkgPath)
+func newPkgGraph() *pkgGraph {
+	return &pkgGraph{
+		lut: make(map[string]*pkgNode),
 	}
 }
 
-func (p *PkgGraph) AddNode(pkgPath string) {
-	p.addNode(pkgPath)
-	p.updateRoots()
+func (g *pkgGraph) addNode(pkgPath string) {
+	if _, exists := g.lut[pkgPath]; !exists {
+		g.lut[pkgPath] = newPkgNode(pkgPath)
+	}
 }
 
-func (p *PkgGraph) GetNode(pkgPath string) *PkgNode {
-	if node, exists := p.lut[pkgPath]; exists {
+func (g *pkgGraph) getNode(pkgPath string) *pkgNode {
+	if node, exists := g.lut[pkgPath]; exists {
 		return node
-	} else {
-		return nil
 	}
+	return nil
 }
 
-func (p *PkgGraph) Size() int {
-	return len(p.lut)
+func (g *pkgGraph) size() int {
+	return len(g.lut)
 }
 
-func (p *PkgGraph) Load(pkg string) error {
+func (g *pkgGraph) load(pkg string) error {
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedImports,
 	}
@@ -47,27 +43,21 @@ func (p *PkgGraph) Load(pkg string) error {
 	}
 
 	for _, pkg := range pkgs {
-		p.addNode(pkg.PkgPath)
+		g.addNode(pkg.PkgPath)
 		for _, dependsOn := range pkg.Imports {
-			p.addNode(dependsOn.PkgPath)
-			p.GetNode(pkg.PkgPath).DependOn(p.GetNode(dependsOn.PkgPath))
+			g.addNode(dependsOn.PkgPath)
+			g.getNode(pkg.PkgPath).dependOn(g.getNode(dependsOn.PkgPath))
 		}
 	}
 
-	p.updateRoots()
+	g.updateRoots()
 	return nil
 }
 
-func (p *PkgGraph) Roots() []*PkgNode {
-	return p.roots
-}
-
-func (p *PkgGraph) updateRoots() {
-	p.roots = make([]*PkgNode, 0)
-
-	for _, node := range p.lut {
+func (g *pkgGraph) updateRoots() {
+	for _, node := range g.lut {
 		if len(node.dependedOnBy) == 0 {
-			p.roots = append(p.roots, node)
+			g.roots = append(g.roots, node)
 		}
 	}
 }

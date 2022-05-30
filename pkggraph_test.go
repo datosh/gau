@@ -6,18 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPkgGraph_AddNode(t *testing.T) {
-	graph := NewPkgGraph()
-
-	graph.AddNode("foo")
-
-	assert.Equal(t, "foo", graph.GetNode("foo").pkgPath)
-}
-
 func TestPkgGraph_GetNode_NotAdded(t *testing.T) {
-	graph := NewPkgGraph()
+	graph := newPkgGraph()
 
-	assert.Nil(t, graph.GetNode("foo"))
+	assert.Nil(t, graph.getNode("foo"))
 }
 
 func TestPkgGraph_Size(t *testing.T) {
@@ -41,49 +33,49 @@ func TestPkgGraph_Size(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			graph := NewPkgGraph()
-			graph.Load(tc.path)
-			assert.Equal(t, tc.wantSize, graph.Size())
+			graph := newPkgGraph()
+			graph.load(tc.path)
+			assert.Equal(t, tc.wantSize, graph.size())
 		})
 	}
 }
 
 func TestPkgGraph_IsDependingOn(t *testing.T) {
 	assert := assert.New(t)
-	graph := NewPkgGraph()
+	graph := newPkgGraph()
 
-	graph.Load("github.com/datosh/gau/tests/dependona")
+	graph.load("github.com/datosh/gau/tests/dependona")
 
-	assert.True(graph.GetNode("github.com/datosh/gau/tests/dependona").
-		IsDependingOn("github.com/datosh/gau/tests/a"),
+	assert.True(graph.getNode("github.com/datosh/gau/tests/dependona").
+		isDependingOn("github.com/datosh/gau/tests/a"),
 	)
 }
 
 func TestPkgGraph_IsDependedOnBy(t *testing.T) {
 	assert := assert.New(t)
-	graph := NewPkgGraph()
+	graph := newPkgGraph()
 
-	graph.Load("github.com/datosh/gau/tests/dependona")
+	graph.load("github.com/datosh/gau/tests/dependona")
 
-	assert.True(graph.GetNode("github.com/datosh/gau/tests/a").
-		IsDependedOnBy("github.com/datosh/gau/tests/dependona"),
+	assert.True(graph.getNode("github.com/datosh/gau/tests/a").
+		isDependedOnBy("github.com/datosh/gau/tests/dependona"),
 	)
 }
 
 func TestPkgGraph_Roots(t *testing.T) {
 	assert := assert.New(t)
-	graph := NewPkgGraph()
+	graph := newPkgGraph()
 
-	graph.Load("github.com/datosh/gau/tests/a")
+	graph.load("github.com/datosh/gau/tests/a")
 
-	assert.Len(graph.Roots(), 1)
+	assert.Len(graph.roots, 1)
 }
 
 func TestPkgGraph_RootsVariadic(t *testing.T) {
 	assert := assert.New(t)
-	graph := NewPkgGraph()
+	graph := newPkgGraph()
 
-	graph.Load("github.com/datosh/gau/tests/...")
+	graph.load("github.com/datosh/gau/tests/...")
 
-	assert.Len(graph.Roots(), 4)
+	assert.Len(graph.roots, 4)
 }
