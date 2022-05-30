@@ -13,6 +13,7 @@ type gau struct {
 
 	should bool
 
+	except   []string
 	resideIn []string
 }
 
@@ -46,6 +47,11 @@ func (g *gau) ShouldNot() *gau {
 	return g
 }
 
+func (g *gau) Except(pkg string) *gau {
+	g.except = append(g.except, expand(pkg)...)
+	return g
+}
+
 func (g *gau) DirectlyDependOn(pkg string) {
 	for _, resideIn := range g.resideIn {
 		g.directlyDependOn(resideIn, pkg)
@@ -53,6 +59,9 @@ func (g *gau) DirectlyDependOn(pkg string) {
 }
 
 func (g *gau) directlyDependOn(depender, dependee string) {
+	if g.inExcept(depender) {
+		return
+	}
 	if xor(g.isDirectlyDependOn(depender, dependee), g.should) {
 		g.t.Fail()
 	}
@@ -70,6 +79,15 @@ func (g *gau) IndirectlyDependOn(pkg string) {
 			}
 		}
 	}
+}
+
+func (g *gau) inExcept(pkg string) bool {
+	for _, exception := range g.except {
+		if exception == pkg {
+			return true
+		}
+	}
+	return false
 }
 
 func xor(a, b bool) bool {

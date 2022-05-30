@@ -56,6 +56,13 @@ func TestGau(t *testing.T) {
 					ShouldNot().DirectlyDependOn("github.com/datosh/gau/tests/nodependency")
 			},
 		},
+		"success: no one except indirectona should directly depend on dependona": {
+			applier: func(g *gau) {
+				g.ResideIn("github.com/datosh/gau/tests/...").
+					Except("github.com/datosh/gau/tests/indirectona").
+					ShouldNot().DirectlyDependOn("github.com/datosh/gau/tests/dependona")
+			},
+		},
 	}
 
 	for name, tc := range testCases {
