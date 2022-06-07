@@ -110,3 +110,9 @@ func Test_expand(t *testing.T) {
 		})
 	}
 }
+
+func TestSimple(t *testing.T) {
+	Packages(t, "github.com/datosh/gau/tests/...").That().
+		ResideIn("github.com/datosh/gau/tests/dependona").
+		Should().DirectlyDependOn("github.com/datosh/gau/tests/a")
+}

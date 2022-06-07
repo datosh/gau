@@ -1,7 +1,17 @@
 # gau
 
-Golang ArchUnit (gau) Test Framework
+Golang ArchUnit (gau) Test Framework enables you to test your application's
+architecture using Go's build-in unit-testing capabilities.
 
+An example rule could look like this:
+
+```go
+func TestSimple(t *testing.T) {
+	Packages(t, "github.com/datosh/gau/tests/...").That().
+		ResideIn("github.com/datosh/gau/tests/dependona").
+		Should().DirectlyDependOn("github.com/datosh/gau/tests/a")
+}
+```
 
 ## Credit
 
